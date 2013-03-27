@@ -21,7 +21,7 @@ public class Api {
                 apiCallbacks,
                 adapter,
                 cache,
-                apiMethod).execute(null);
+                apiMethod).execute((Void[]) null);
 
     }
 }
