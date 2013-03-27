@@ -19,16 +19,18 @@ public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
     private ApiAdapter adapter;
     private final AndroidHttpClient client;
     private IOException exception;
+    private ApiCache cache;
 
     public ApiTask(Context context,
                    HttpUriRequest method,
                    ApiCallbacks apiCallbacks,
-                   ApiAdapter adapter
-    ) {
+                   ApiAdapter adapter,
+                   ApiCache cache) {
         this.context = context;
         this.method = method;
         this.apiCallbacks = apiCallbacks;
         this.adapter = adapter;
+        this.cache = cache;
         client = AndroidHttpClient.newInstance(null, context);
 
     }
@@ -36,7 +38,7 @@ public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
     @Override protected ApiModel doInBackground(Void... voids) {
         try {
             HttpResponse httpResponse = client.execute(method);
-            return adapter.parseToModel(httpResponse.getEntity().getContent());
+            return adapter.parseToModel(apiCallbacks.getClazz(),httpResponse.getEntity().getContent());
         } catch (IOException e) {
             Log.e(TAG, e.getMessage(), e);
             exception = e;

@@ -11,7 +11,7 @@ public interface ApiMethod {
 
     public String getHost();
 
-    public String getMethod();
+    public String getPath();
 
     public String getCacheKey();
 
