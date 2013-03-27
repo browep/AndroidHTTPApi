@@ -1,4 +1,4 @@
-package com.github.browep.httpapi.example;
+package com.github.browep.api.impl;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -7,7 +7,6 @@ import com.github.browep.httpapi.ApiMethod;
 
 public class ExampleApiActivity extends Activity {
     private static String TAG = ExampleApiActivity.class.getCanonicalName();
-    private Api api;
 
     @Override protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
