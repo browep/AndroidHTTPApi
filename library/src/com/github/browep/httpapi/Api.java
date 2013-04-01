@@ -6,9 +6,9 @@ public class Api {
     private static String TAG = Api.class.getCanonicalName();
     public static int UNKNOWN_ERROR = 600;
 
-    private Context context;
-    private ApiCache cache;
-    private ApiAdapter adapter;
+    protected Context context;
+    protected ApiCache cache;
+    protected ApiAdapter adapter;
 
     public Api(Context context, ApiCache cache, ApiAdapter adapter) {
         this.context = context;
