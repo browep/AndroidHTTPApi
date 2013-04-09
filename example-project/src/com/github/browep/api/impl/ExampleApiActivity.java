@@ -24,7 +24,7 @@ public class ExampleApiActivity extends Activity {
         textView.setMovementMethod(new ScrollingMovementMethod());
         setContentView(textView);
 
-        api = new Api(this, new ExampleApiCacheImpl(getCacheDir()), new GsonApiAdapterImpl());
+        api = new Api(this, new ExampleApiCacheImpl(getCacheDir()), new GsonApiAdapterImpl(), null);
 
         final long nonCacheStart = System.currentTimeMillis();
         api.get(new ExampleNonCachingApiMethodImpl(),new ApiCallbacks<GetApiModel>(GetApiModel.class) {

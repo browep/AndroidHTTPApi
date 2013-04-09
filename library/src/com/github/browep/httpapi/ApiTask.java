@@ -6,6 +6,8 @@ import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -23,19 +25,21 @@ public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
     private Exception exception;
     private ApiCache cache;
     private ApiMethod apiMethod;
+    private ApiAuthenticator authenticator;
 
     public ApiTask(Context context,
                    ApiCallbacks apiCallbacks,
                    ApiAdapter adapter,
-                   ApiCache cache, ApiMethod apiMethod) {
+                   ApiCache cache,
+                   ApiMethod apiMethod, ApiAuthenticator authenticator) {
         this.context = context;
         this.apiCallbacks = apiCallbacks;
         this.adapter = adapter;
         this.cache = cache;
         this.apiMethod = apiMethod;
+        this.authenticator = authenticator;
 
-        client = AndroidHttpClient.newInstance(null, context);
-
+        client = AndroidHttpClient.newInstance("Android Client 0.0.1");
     }
 
     @Override protected ApiModel doInBackground(Void... voids) {
@@ -47,8 +51,10 @@ public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
             } else {
                 HttpUriRequest httpUriRequest = null;
 
-                URI uri = new URI(apiMethod.getProtocol().toString().toLowerCase(), apiMethod.getHost(),
-                        apiMethod.getPath(), null);
+                URI uri = new URI(apiMethod.getProtocol().toString().toLowerCase(),
+                        apiMethod.getHost(),
+                        apiMethod.getPath(),
+                        null);
 
                 switch (apiMethod.getMethod()) {
                     case GET:
@@ -59,12 +65,32 @@ public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
                         break;
                 }
 
+                if (authenticator != null){
+                    authenticator.authenticate(httpUriRequest);
+                }
+
+                httpUriRequest.addHeader("Accept","*/*");
+
                 HttpResponse httpResponse = client.execute(httpUriRequest);
-                if( cache != null && !TextUtils.isEmpty(apiMethod.getCacheKey())){
-                    cache.put(apiMethod,httpResponse.getEntity().getContent());
-                    return adapter.parseToModel(apiCallbacks.getClazz(), cache.get(apiMethod));
+
+                // successful call
+                if (httpResponse != null && httpResponse.getStatusLine() != null
+                        && httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                    if( cache != null && !TextUtils.isEmpty(apiMethod.getCacheKey())){
+                        cache.put(apiMethod,httpResponse.getEntity().getContent());
+                        return adapter.parseToModel(apiCallbacks.getClazz(), cache.get(apiMethod));
+                    } else {
+                        return adapter.parseToModel(apiCallbacks.getClazz(), httpResponse.getEntity().getContent());
+                    }
                 } else {
-                    return adapter.parseToModel(apiCallbacks.getClazz(), httpResponse.getEntity().getContent());
+
+                    // unsuccessful call
+                    if (httpResponse != null) {
+                        throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+                    } else {
+                        throw new Exception("unknown connection issue");
+                    }
+
                 }
 
             }
