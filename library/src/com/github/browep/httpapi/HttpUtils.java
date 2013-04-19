@@ -16,8 +16,9 @@ public class HttpUtils {
 
     public static void logHttpObject(HttpUriRequest method) {
         Log.d(TAG, "HOST:" + method.getURI().getHost() );
-        Log.d(TAG, "PATH:" + method.getURI().getPath() );
         Log.d(TAG, "METHOD:" + method.getMethod());
+        Log.d(TAG, "PATH:" + method.getURI().getPath() );
+        Log.d(TAG, "QUERY:" + method.getURI().getQuery() );
 
         HttpParams httpParams = method.getParams();
         Class clazz = httpParams.getClass();

@@ -21,4 +21,7 @@ public interface ApiMethod {
 
     public String getCacheKey();
 
+    public String getQueryString();
+
+
 }

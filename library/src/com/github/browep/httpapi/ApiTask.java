@@ -54,7 +54,7 @@ public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
                 URI uri = new URI(apiMethod.getProtocol().toString().toLowerCase(),
                         apiMethod.getHost(),
                         apiMethod.getPath(),
-                        null);
+                        apiMethod.getQueryString(), null);
 
                 switch (apiMethod.getMethod()) {
                     case GET:
@@ -70,6 +70,8 @@ public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
                 }
 
                 httpUriRequest.addHeader("Accept","*/*");
+
+//                HttpUtils.logHttpObject(httpUriRequest);
 
                 HttpResponse httpResponse = client.execute(httpUriRequest);
 

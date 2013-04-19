@@ -70,6 +70,10 @@ public class ExampleApiActivity extends Activity {
         public String getCacheKey() {
             return null;
         }
+
+        public String getQueryString() {
+            return null;
+        }
     }
 
     public static class ExampleCachingApiMethodImpl extends ExampleNonCachingApiMethodImpl {
