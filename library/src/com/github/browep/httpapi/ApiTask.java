@@ -7,6 +7,7 @@ import android.text.TextUtils;
 import android.util.Log;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -17,11 +18,11 @@ import java.net.URI;
 public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
     private static String TAG = ApiTask.class.getCanonicalName();
 
-    private Context context;
+    protected Context context;
     private HttpUriRequest method;
     private ApiCallbacks apiCallbacks;
     private ApiAdapter adapter;
-    private final AndroidHttpClient client;
+    private final HttpClient client;
     private Exception exception;
     private ApiCache cache;
     private ApiMethod apiMethod;
@@ -39,7 +40,11 @@ public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
         this.apiMethod = apiMethod;
         this.authenticator = authenticator;
 
-        client = AndroidHttpClient.newInstance("Android Client 0.0.1");
+        client = getAndroidHttpClient();
+    }
+
+    public HttpClient getAndroidHttpClient() {
+        return AndroidHttpClient.newInstance("Android Client 0.0.1");
     }
 
     @Override protected ApiModel doInBackground(Void... voids) {
@@ -62,6 +67,8 @@ public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
                         break;
                     case POST:
                         httpUriRequest = new HttpPost(uri);
+                        HttpPost httpPost = (HttpPost) httpUriRequest;
+                        httpPost.setEntity(adapter.toMultipartEntity(apiMethod));
                         break;
                 }
 
@@ -99,11 +106,7 @@ public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
             exception = e;
-        } finally {
-            if (client != null)
-                client.close();
         }
-
         return null;
     }
 
