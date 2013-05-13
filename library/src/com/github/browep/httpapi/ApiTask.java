@@ -7,7 +7,6 @@ import android.text.TextUtils;
 import android.util.Log;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -22,7 +21,7 @@ public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
     private HttpUriRequest method;
     private ApiCallbacks apiCallbacks;
     private ApiAdapter adapter;
-    private final HttpClient client;
+    private final AndroidHttpClient client;
     private Exception exception;
     private ApiCache cache;
     private ApiMethod apiMethod;
@@ -43,7 +42,7 @@ public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
         client = getAndroidHttpClient();
     }
 
-    public HttpClient getAndroidHttpClient() {
+    public AndroidHttpClient getAndroidHttpClient() {
         return AndroidHttpClient.newInstance("Android Client 0.0.1");
     }
 
@@ -68,7 +67,7 @@ public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
                     case POST:
                         httpUriRequest = new HttpPost(uri);
                         HttpPost httpPost = (HttpPost) httpUriRequest;
-                        httpPost.setEntity(adapter.toMultipartEntity(apiMethod));
+                        adapter.createRequest(httpPost, apiMethod);
                         break;
                 }
 
@@ -106,7 +105,11 @@ public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
         } catch (Exception e) {
             Log.e(TAG, e.getMessage(), e);
             exception = e;
+        } finally {
+            if (client != null)
+                client.close();
         }
+
         return null;
     }
 
