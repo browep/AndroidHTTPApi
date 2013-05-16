@@ -47,6 +47,10 @@ public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
     }
 
     @Override protected ApiModel doInBackground(Void... voids) {
+        return doInBackground();
+    }
+
+    public ApiModel doInBackground() {
         try {
             if (cache != null && cache.exists(apiMethod)) {
 
