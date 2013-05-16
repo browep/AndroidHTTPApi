@@ -81,24 +81,25 @@ public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
 
                 HttpResponse httpResponse = client.execute(httpUriRequest);
 
-                // successful call
-                if (httpResponse != null && httpResponse.getStatusLine() != null
-                        && httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                    if( cache != null && !TextUtils.isEmpty(apiMethod.getCacheKey())){
-                        cache.put(apiMethod,httpResponse.getEntity().getContent());
-                        return adapter.parseToModel(apiCallbacks.getClazz(), cache.get(apiMethod));
+                if (!isCancelled()) {// successful call
+                    if (httpResponse != null && httpResponse.getStatusLine() != null
+                            && httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                        if (cache != null && !TextUtils.isEmpty(apiMethod.getCacheKey())) {
+                            cache.put(apiMethod, httpResponse.getEntity().getContent());
+                            return adapter.parseToModel(apiCallbacks.getClazz(), cache.get(apiMethod));
+                        } else {
+                            return adapter.parseToModel(apiCallbacks.getClazz(), httpResponse.getEntity().getContent());
+                        }
                     } else {
-                        return adapter.parseToModel(apiCallbacks.getClazz(), httpResponse.getEntity().getContent());
-                    }
-                } else {
 
-                    // unsuccessful call
-                    if (httpResponse != null) {
-                        throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
-                    } else {
-                        throw new Exception("unknown connection issue");
-                    }
+                        // unsuccessful call
+                        if (httpResponse != null) {
+                            throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+                        } else {
+                            throw new Exception("unknown connection issue");
+                        }
 
+                    }
                 }
 
             }
@@ -120,6 +121,12 @@ public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
             apiCallbacks.onFailure(exception != null ? exception : new ApiException(Api.UNKNOWN_ERROR, ""));
         }
     }
+
+    @Override protected void onCancelled() {
+        super.onCancelled();
+        Log.d(TAG, "cancelled: " + (apiMethod != null ? apiMethod.getPath() : null));
+    }
+
 
 }
 
