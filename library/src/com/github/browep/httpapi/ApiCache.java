@@ -6,4 +6,5 @@ public interface ApiCache {
     public InputStream get(ApiMethod apiMethod);
     public boolean exists(ApiMethod apiMethod);
     public void put(ApiMethod apiMethod, InputStream inputStream);
+    public void clear();
 }
