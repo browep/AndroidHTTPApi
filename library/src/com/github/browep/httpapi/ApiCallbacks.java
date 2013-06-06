@@ -1,7 +1,5 @@
 package com.github.browep.httpapi;
 
-import java.io.IOException;
-
 public abstract class ApiCallbacks<T extends ApiModel> {
     static String TAG = ApiCallbacks.class.getCanonicalName();
     private Class<T> clazz;
@@ -15,6 +13,6 @@ public abstract class ApiCallbacks<T extends ApiModel> {
     }
 
     public abstract void onSuccess(T apiModel);
-    public abstract void onFailure(IOException apiException);
+    public abstract void onFailure(Exception apiException);
 
 }

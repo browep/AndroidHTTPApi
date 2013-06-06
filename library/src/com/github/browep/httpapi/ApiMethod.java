@@ -7,6 +7,12 @@ public interface ApiMethod {
         HTTP, HTTPS
     }
 
+    public static enum HttpMethod {
+        GET, POST
+    }
+
+    public HttpMethod getMethod();
+
     public HttpProtocol getProtocol();
 
     public String getHost();
@@ -14,5 +20,8 @@ public interface ApiMethod {
     public String getPath();
 
     public String getCacheKey();
+
+    public String getQueryString();
+
 
 }
