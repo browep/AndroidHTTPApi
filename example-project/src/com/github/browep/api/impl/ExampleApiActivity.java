@@ -1,16 +1,33 @@
 package com.github.browep.api.impl;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import com.github.browep.httpapi.Api;
+import com.github.browep.httpapi.ApiAdapter;
+import com.github.browep.httpapi.ApiCache;
+import com.github.browep.httpapi.ApiCallbacks;
+import com.github.browep.httpapi.ApiMethod;
+import com.github.browep.httpapi.ApiModel;
+
+import org.apache.http.client.methods.HttpPost;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.widget.TextView;
-import com.github.browep.httpapi.*;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 
 public class ExampleApiActivity extends Activity {
     private static String TAG = ExampleApiActivity.class.getCanonicalName();
@@ -117,6 +134,12 @@ public class ExampleApiActivity extends Activity {
             }
         }
 
+        public void clear() {
+            for (File file : cacheDir.listFiles()) {
+                file.delete();
+            }
+        }
+
         public InputStream get(ApiMethod apiMethod) {
             if (exists(apiMethod)) {
                 try {
@@ -140,6 +163,10 @@ public class ExampleApiActivity extends Activity {
 
         public ApiModel parseToModel(Class clazz, InputStream inputStream) {
             return (ApiModel) gson.fromJson(new InputStreamReader(inputStream), clazz);
+        }
+
+        public void createRequest(HttpPost httpPost, ApiMethod apiMethod) {
+            // create POST body here
         }
     }
 
