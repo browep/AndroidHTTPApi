@@ -1,10 +1,5 @@
 package com.github.browep.httpapi;
 
-import android.content.Context;
-import android.net.http.AndroidHttpClient;
-import android.os.AsyncTask;
-import android.text.TextUtils;
-import android.util.Log;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpResponseException;
@@ -12,13 +7,20 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+import android.net.http.AndroidHttpClient;
+import android.os.AsyncTask;
+import android.text.TextUtils;
+import android.util.Log;
+
 import java.net.URI;
 
 public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
     private static String TAG = ApiTask.class.getCanonicalName();
 
     protected Context context;
-    private HttpUriRequest method;
     private ApiCallbacks apiCallbacks;
     private ApiAdapter adapter;
     private final AndroidHttpClient client;
@@ -83,27 +85,31 @@ public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
 
 //                HttpUtils.logHttpObject(httpUriRequest);
 
-                HttpResponse httpResponse = client.execute(httpUriRequest);
+                if (isNetworkAvailable()) {
+                    HttpResponse httpResponse = client.execute(httpUriRequest);
 
-                if (!isCancelled()) {// successful call
-                    if (httpResponse != null && httpResponse.getStatusLine() != null
-                            && httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
-                        if (cache != null && !TextUtils.isEmpty(apiMethod.getCacheKey())) {
-                            cache.put(apiMethod, httpResponse.getEntity().getContent());
-                            return adapter.parseToModel(apiCallbacks.getClazz(), cache.get(apiMethod));
+                    if (!isCancelled()) {// successful call
+                        if (httpResponse != null && httpResponse.getStatusLine() != null
+                                && httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                            if (cache != null && !TextUtils.isEmpty(apiMethod.getCacheKey())) {
+                                cache.put(apiMethod, httpResponse.getEntity().getContent());
+                                return adapter.parseToModel(apiCallbacks.getClazz(), cache.get(apiMethod));
+                            } else {
+                                return adapter.parseToModel(apiCallbacks.getClazz(), httpResponse.getEntity().getContent());
+                            }
                         } else {
-                            return adapter.parseToModel(apiCallbacks.getClazz(), httpResponse.getEntity().getContent());
-                        }
-                    } else {
 
-                        // unsuccessful call
-                        if (httpResponse != null) {
-                            throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
-                        } else {
-                            throw new Exception("unknown connection issue");
-                        }
+                            // unsuccessful call
+                            if (httpResponse != null) {
+                                throw new HttpResponseException(httpResponse.getStatusLine().getStatusCode(), httpResponse.getStatusLine().getReasonPhrase());
+                            } else {
+                                throw new Exception("unknown connection issue");
+                            }
 
+                        }
                     }
+                } else {
+                    exception = new ApiException.NoNetworkException();
                 }
 
             }
@@ -131,6 +137,13 @@ public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
         Log.d(TAG, "cancelled: " + (apiMethod != null ? apiMethod.getPath() : null));
     }
 
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+              = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
+    }
 
 }
 

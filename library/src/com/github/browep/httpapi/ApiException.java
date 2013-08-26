@@ -9,5 +9,11 @@ public class ApiException extends HttpResponseException {
         super(statusCode, s);
     }
 
+    public static class NoNetworkException extends ApiException {
+
+        public NoNetworkException() {
+            super(600, "No Network Available");
+        }
+    }
 
 }
