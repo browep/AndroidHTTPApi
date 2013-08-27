@@ -8,7 +8,7 @@ public interface ApiMethod {
     }
 
     public static enum HttpMethod {
-        GET, POST
+        GET, POST, PUT
     }
 
     public HttpMethod getMethod();

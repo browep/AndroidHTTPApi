@@ -9,6 +9,8 @@ import android.widget.TextView;
 import com.github.browep.httpapi.*;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 
 import java.io.*;
 
@@ -117,6 +119,10 @@ public class ExampleApiActivity extends Activity {
             }
         }
 
+        @Override
+        public void clear() {
+        }
+
         public InputStream get(ApiMethod apiMethod) {
             if (exists(apiMethod)) {
                 try {
@@ -138,8 +144,21 @@ public class ExampleApiActivity extends Activity {
             gson = new GsonBuilder().create();
         }
 
+        @Override
+        public ApiModel parseToModel(Class clazz, String string) {
+            return (ApiModel) gson.fromJson(string, clazz);
+        }
+
         public ApiModel parseToModel(Class clazz, InputStream inputStream) {
             return (ApiModel) gson.fromJson(new InputStreamReader(inputStream), clazz);
+        }
+
+        @Override
+        public void createRequest(HttpPost httpPost, ApiMethod apiMethod) {
+        }
+
+        @Override
+        public void createRequest(HttpPut httpPut, ApiMethod apiMethod) {
         }
     }
 
