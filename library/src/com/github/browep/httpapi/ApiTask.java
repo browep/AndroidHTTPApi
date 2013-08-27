@@ -10,6 +10,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 
 import java.net.URI;
@@ -73,6 +74,11 @@ public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
                         HttpPost httpPost = (HttpPost) httpUriRequest;
                         adapter.createRequest(httpPost, apiMethod);
                         break;
+                    case PUT:
+                        httpUriRequest = new HttpPut(uri);
+                        HttpPut httpPut = (HttpPut) httpUriRequest;
+                        adapter.createRequest(httpPut, apiMethod);
+                        break;
                 }
 
                 if (authenticator != null){
@@ -85,9 +91,10 @@ public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
 
                 HttpResponse httpResponse = client.execute(httpUriRequest);
 
-                if (!isCancelled()) {// successful call
+                if (!isCancelled()) {// successful call - 200 <= code < 300
                     if (httpResponse != null && httpResponse.getStatusLine() != null
-                            && httpResponse.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                            && (httpResponse.getStatusLine().getStatusCode() >= HttpStatus.SC_OK &&
+                            httpResponse.getStatusLine().getStatusCode() < HttpStatus.SC_MULTIPLE_CHOICES)) {
                         if (cache != null && !TextUtils.isEmpty(apiMethod.getCacheKey())) {
                             cache.put(apiMethod, httpResponse.getEntity().getContent());
                             return adapter.parseToModel(apiCallbacks.getClazz(), cache.get(apiMethod));
