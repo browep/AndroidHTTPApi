@@ -1,6 +1,7 @@
 package com.github.browep.httpapi;
 
-import android.util.Log;
+import com.github.browep.extlogging.Log;
+
 import org.apache.http.Header;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
@@ -15,7 +16,7 @@ public class HttpUtils {
     private static String TAG = HttpUtils.class.getCanonicalName();
 
     public static void logHttpObject(HttpUriRequest method) {
-        Log.d(TAG, "HOST:" + method.getURI().getHost() );
+        Log.d(TAG, "HOST:" + method.getURI().getHost());
         Log.d(TAG, "METHOD:" + method.getMethod());
         Log.d(TAG, "PATH:" + method.getURI().getPath() );
         Log.d(TAG, "QUERY:" + method.getURI().getQuery() );

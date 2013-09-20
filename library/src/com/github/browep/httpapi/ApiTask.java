@@ -124,7 +124,7 @@ public class ApiTask extends AsyncTask<Void, Void, ApiModel> {
         return null;
     }
 
-    @Override protected void onPostExecute(ApiModel apiModel) {
+    @Override public void onPostExecute(ApiModel apiModel) {
         if (apiModel != null) {
             apiCallbacks.onSuccess(apiModel);
         } else {
